@@ -1,0 +1,115 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+local Window = OrionLib:MakeWindow({Name = "StarHub", HidePremium = false, SaveConfig = true, ConfigFolder = "StarConfig",})
+
+_G.d = false
+function DayMode()
+    if _G.d == false then
+        _G.d = true
+        game.Lighting.ClockTime = 0
+    else
+        game.Lighting.ClockTime = 12
+        _G.d = false
+    end
+end
+
+local Visual = Window:MakeTab({
+    Name = "Visual",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local Section = Visual:AddSection({
+    Name = "Lighting"
+})
+
+Visual:AddToggle({
+    Name = "Day mode",
+    Default = false,
+    Callback = function(Value)
+       DayMode()
+        print(Value)
+    end    
+})
+
+local Player = Window:MakeTab({
+    Name = "Character",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local Section = Player:AddSection({
+    Name = "Movements"
+})
+
+_G.spide = false
+function OpcSpeed()
+    if _G.spide == false then
+        _G.spide = true
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 20
+    else
+        _G.spide = false
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 80
+    end
+end
+
+Player:AddToggle({
+    Name = "Speed",
+    Default = false,
+    Callback = function(Value)
+       OpcSpeed()
+        print(Value)
+    end    
+})
+
+local function applyHighlights()
+    -- Função para criar destaque
+    local function createHighlight(instance, color)
+        local highlight = Instance.new("Highlight")
+        highlight.Parent = instance
+        highlight.FillColor = color
+        highlight.OutlineColor = color
+        highlight.Adornee = instance
+    end
+
+    -- Aplica os destaques inicialmente
+    for _, object in pairs(workspace:GetDescendants()) do
+        if object:IsA("Model") and object:FindFirstChild("Humanoid") then
+            local humanoid = object:FindFirstChild("Humanoid")
+            local player = game.Players:GetPlayerFromCharacter(object)
+
+            if player then
+                -- Destaca jogadores em verde
+                createHighlight(object, Color3.fromRGB(0, 255, 0))
+            else
+                -- Destaca humanoides que não são jogadores em vermelho
+                createHighlight(object, Color3.fromRGB(255, 0, 0))
+            end
+        end
+    end
+
+    -- Atualiza os destaques quando novos objetos são adicionados
+    workspace.DescendantAdded:Connect(function(descendant)
+        if descendant:IsA("Model") and descendant:FindFirstChild("Humanoid") then
+            local humanoid = descendant:FindFirstChild("Humanoid")
+            local player = game.Players:GetPlayerFromCharacter(descendant)
+
+            if player then
+                createHighlight(descendant, Color3.fromRGB(0, 255, 0))
+            else
+                createHighlight(descendant, Color3.fromRGB(255, 0, 0))
+            end
+        end
+    end)
+end
+
+local Section = Visual:AddSection({
+    Name = "Esp"
+})
+
+Visual:AddButton({
+    Name = "Esp All",
+    Callback = function()
+        applyHighlights()
+    end    
+})
